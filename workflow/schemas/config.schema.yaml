@@ -32,30 +32,6 @@ properties:
     required:
       - activate
 
-  pca:
-    type: object
-    properties:
-      activate:
-       type: boolean
-      labels:
-        type: 
-          - array
-          - string
-        items:
-          type: string
-    required:
-      - activate
-
-  diffexp:
-    type: object
-    properties:
-      contrasts:
-        type: object
-      model:
-        type: string
-    required:
-      - contrasts
-
   params:
     type: object
     properties:
@@ -74,7 +50,5 @@ required:
   - samples
   - units
   - ref
-  - pca
-  - diffexp
   - params
   - trimming
