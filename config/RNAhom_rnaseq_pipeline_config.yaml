@@ -4,9 +4,9 @@ mem: '32000'
 threads: 2
 
 ##### GENERAL #####
-project_name: MyRNAproject # name of the project/dataset
-result_path: /path/to/results/ # path to the output folder
-annotation: /path/to/MyRNAproject_rnaseq_pipeline_annotation.csv # path to annotation file, specified in config/README.md
+project_name: RNAhom
+result_path: /nobackup/lab_bock/projects/JakStruct/results/RNAhom/
+annotation: config/RNAhom_rnaseq_pipeline_annotation.csv
 
 ##### PROCESSING #####
 

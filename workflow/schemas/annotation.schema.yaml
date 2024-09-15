@@ -1,22 +1,16 @@
 $schema: "http://json-schema.org/draft-04/schema#"
-description: row of the units.tsv, representing a sequencing unit, i.e. single-end or paired-end data
+description: row of the annotation.csv, representing a sequencing unit, i.e. single-end or paired-end data
 type: object
 properties:
   sample_name:
     type: string
     description: sample name/id the unit has been sequenced from
-  unit_name:
+  read_type:
     type: string
-    description: unit id
-  fq1:
+    description:  one of the values 'single' or 'paired'
+  bam_file:
     type: string
-    description: path to FASTQ file
-  fq2:
-    type: string
-    description: path to second FASTQ file (leave empty in case of single-end)
-  sra:
-    type: string
-    description: SRA id for automatic download of unit
+    description: sequencing unit path to BAM file
   adapters:
     type: string
     description: adapter trimming settings to use (for cutadapt)
@@ -26,4 +20,5 @@ properties:
 
 required:
   - sample_name
-  - unit_name
+  - read_type
+  - bam_file

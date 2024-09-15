@@ -1,0 +1,3 @@
+﻿sample_name,read_type,bam_file,adapters,strandedness
+Colon_Endo_IFNGR1_1,paired,/research/lab_bock/projects/JakStruct/data/MJ050_JAK_STAT_RNA_SEQ_L5668/BSF_1355_HGWFHDMXY_1_samples/BSF_1355_HGWFHDMXY_1#Colon_Endo_IFNGR1_S130166.bam,,
+Colon_Endo_IFNGR1_2,paired,/research/lab_bock/projects/JakStruct/data/MJ051_JAK_STAT_RNA_SEQ_L5669/BSF_1355_HGWFHDMXY_2_samples/BSF_1355_HGWFHDMXY_2#Colon_Endo_IFNGR1_S130226.bam,,

@@ -1,6 +1,6 @@
 rule get_genome:
     output:
-        "resources/genome.fasta",
+        os.path.join(resource_path,"genome.fasta"),
     log:
         "logs/get-genome.log",
     params:
@@ -15,7 +15,7 @@ rule get_genome:
 
 rule get_annotation:
     output:
-        "resources/genome.gtf",
+        os.path.join(resource_path,"genome.gtf"),
     params:
         species=config["ref"]["species"],
         fmt="gtf",
@@ -31,9 +31,9 @@ rule get_annotation:
 
 rule genome_faidx:
     input:
-        "resources/genome.fasta",
+        os.path.join(resource_path,"genome.fasta"),
     output:
-        "resources/genome.fasta.fai",
+        os.path.join(resource_path,"genome.fasta.fai"),
     log:
         "logs/genome-faidx.log",
     cache: True
@@ -43,9 +43,9 @@ rule genome_faidx:
 
 rule bwa_index:
     input:
-        "resources/genome.fasta",
+        os.path.join(resource_path,"genome.fasta"),
     output:
-        multiext("resources/genome.fasta", ".amb", ".ann", ".bwt", ".pac", ".sa"),
+        multiext(os.path.join(resource_path,"genome.fasta", ".amb", ".ann", ".bwt", ".pac", ".sa")),
     log:
         "logs/bwa_index.log",
     resources:
@@ -57,10 +57,10 @@ rule bwa_index:
 
 rule star_index:
     input:
-        fasta="resources/genome.fasta",
-        annotation="resources/genome.gtf",
+        fasta=os.path.join(resource_path,"genome.fasta"),
+        annotation=os.path.join(resource_path,"genome.gtf"),
     output:
-        directory("resources/star_genome"),
+        directory(os.path.join(resource_path,"star_genome")),
     threads: 4
     params:
         extra=lambda wc, input: f"--sjdbGTFfile {input.annotation} --sjdbOverhang 100",

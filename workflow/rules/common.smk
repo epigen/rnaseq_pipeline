@@ -1,26 +1,14 @@
 
+def get_raw_bams(wildcards):
+    return annot.loc[wildcards.sample, "bam_file"]
 
-
-def get_final_output():
-    final_output = expand(
-        "results/diffexp/{contrast}.diffexp.symbol.tsv",
-        contrast=config["diffexp"]["contrasts"],
-    )
-    final_output.append("results/deseq2/normcounts.symbol.tsv")
-    final_output.append("results/counts/all.symbol.tsv")
-    final_output.append("results/qc/multiqc_report.html")
-
-    if config["pca"]["activate"]:
-        # get all the variables to plot a PCA for
-        pca_variables = list(config["diffexp"]["variables_of_interest"])
-        if config["diffexp"]["batch_effects"]:
-            pca_variables.extend(config["diffexp"]["batch_effects"])
-        if config["pca"]["labels"]:
-            pca_variables.extend(config["pca"]["labels"])
-        final_output.extend(
-            expand("results/pca.{variable}.svg", variable=pca_variables)
-        )
-    return final_output
+# used in rule count_matrix
+def get_strandedness(annot_samples):
+    if "strandedness" in annot_samples.columns:
+        return annot_samples["strandedness"].tolist()
+    else:
+        strand_list = ["none"]
+        return strand_list * annot_samples.shape[0]
 
 def get_cutadapt_input(wildcards):
     unit = units.loc[wildcards.sample].loc[wildcards.unit]
@@ -57,100 +45,67 @@ def get_cutadapt_pipe_input(wildcards):
     assert len(files) > 0
     return files
 
+# # used in get_fq() below
+# def is_paired_end(sample):
+#     sample_units = units.loc[sample]
+#     fq2_null = sample_units["fq2"].isnull()
+#     sra_null = sample_units["sra"].isnull()
+#     paired = ~fq2_null | ~sra_null
+#     all_paired = paired.all()
+#     all_single = (~paired).all()
+#     assert (
+#         all_single or all_paired
+#     ), "invalid units for sample {}, must be all paired end or all single end".format(
+#         sample
+#     )
+#     return all_paired
 
-def is_paired_end(sample):
-    sample_units = units.loc[sample]
-    fq2_null = sample_units["fq2"].isnull()
-    sra_null = sample_units["sra"].isnull()
-    paired = ~fq2_null | ~sra_null
-    all_paired = paired.all()
-    all_single = (~paired).all()
-    assert (
-        all_single or all_paired
-    ), "invalid units for sample {}, must be all paired end or all single end".format(
-        sample
-    )
-    return all_paired
-
-
-def get_fq(wildcards):
-    if config["trimming"]["activate"]:
-        # activated trimming, use trimmed data
-        if is_paired_end(wildcards.sample):
-            # paired-end sample
-            return dict(
-                zip(
-                    ["fq1", "fq2"],
-                    expand(
-                        "results/trimmed/{sample}_{unit}_{group}.fastq.gz",
-                        group=["R1", "R2"],
-                        **wildcards,
-                    ),
-                )
-            )
-        # single end sample
-        return {
-            "fq1": "results/trimmed/{sample}_{unit}_single.fastq.gz".format(**wildcards)
-        }
-    else:
-        # no trimming, use raw reads
-        u = units.loc[(wildcards.sample, wildcards.unit)]
-        if pd.isna(u["fq1"]):
-            # SRA sample (always paired-end for now)
-            accession = u["sra"]
-            return dict(
-                zip(
-                    ["fq1", "fq2"],
-                    expand(
-                        "sra/{accession}_{group}.fastq",
-                        accession=accession,
-                        group=["R1", "R2"],
-                    ),
-                )
-            )
-        if not is_paired_end(wildcards.sample):
-            return {"fq1": f"{u.fq1}"}
-        else:
-            return {"fq1": f"{u.fq1}", "fq2": f"{u.fq2}"}
-
-
-def get_strandedness(units):
-    if "strandedness" in units.columns:
-        return units["strandedness"].tolist()
-    else:
-        strand_list = ["none"]
-        return strand_list * units.shape[0]
+# # used before in rule align
+# def get_fq(wildcards):
+#     if config["trimming"]["activate"]:
+#         # activated trimming, use trimmed data
+#         if is_paired_end(wildcards.sample):
+#             # paired-end sample
+#             return dict(
+#                 zip(
+#                     ["fq1", "fq2"],
+#                     expand(
+#                         "results/trimmed/{sample}_{unit}_{group}.fastq.gz",
+#                         group=["R1", "R2"],
+#                         **wildcards,
+#                     ),
+#                 )
+#             )
+#         # single end sample
+#         return {
+#             "fq1": "results/trimmed/{sample}_{unit}_single.fastq.gz".format(**wildcards)
+#         }
+#     else:
+#         # no trimming, use raw reads
+#         u = units.loc[(wildcards.sample, wildcards.unit)]
+#         if pd.isna(u["fq1"]):
+#             # SRA sample (always paired-end for now)
+#             accession = u["sra"]
+#             return dict(
+#                 zip(
+#                     ["fq1", "fq2"],
+#                     expand(
+#                         "sra/{accession}_{group}.fastq",
+#                         accession=accession,
+#                         group=["R1", "R2"],
+#                     ),
+#                 )
+#             )
+#         if not is_paired_end(wildcards.sample):
+#             return {"fq1": f"{u.fq1}"}
+#         else:
+#             return {"fq1": f"{u.fq1}", "fq2": f"{u.fq2}"}
 
 
-def is_activated(xpath):
-    c = config
-    for entry in xpath.split("/"):
-        c = c.get(entry, {})
-    return bool(c.get("activate", False))
 
-
+# used for rule gene_2_symbol
 def get_bioc_species_name():
     first_letter = config["ref"]["species"][0]
     subspecies = config["ref"]["species"].split("_")[1]
     return first_letter + subspecies
-
-
-def get_fastqs(wc):
-    if config["trimming"]["activate"]:
-        return expand(
-            "results/trimmed/{sample}/{unit}_{read}.fastq.gz",
-            unit=units.loc[wc.sample, "unit_name"],
-            sample=wc.sample,
-            read=wc.read,
-        )
-    unit = units.loc[wc.sample]
-    if all(pd.isna(unit["fq1"])):
-        # SRA sample (always paired-end for now)
-        accession = unit["sra"]
-        return expand(
-            "sra/{accession}_{read}.fastq", accession=accession, read=wc.read[-1]
-        )
-    fq = "fq{}".format(wc.read[-1])
-    return units.loc[wc.sample, fq].tolist()
-
 

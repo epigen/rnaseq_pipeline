@@ -17,36 +17,23 @@ min_version("8.20.1")
 ##### setup report #####
 report: "report/workflow.rst"
 
-##### load config and sample annotation sheets #####
+##### load and validate config and sample annotation sheets #####
 configfile: "config/config.yaml"
+validate(config, schema="./schemas/config.schema.yaml")
 
-# TODO load annot etc
-validate(config, schema="../schemas/config.schema.yaml")
+# load sample/unit annotation
+annot = pd.read_csv(config["annotation"], dtype={"sample_name": str}).set_index("sample_name", drop=False).sort_index()
+validate(annot, schema="./schemas/annotation.schema.yaml")
 
-samples = (
-    pd.read_csv(config["samples"], sep="\t", dtype={"sample_name": str})
-    .set_index("sample_name", drop=False)
-    .sort_index()
-)
-
-validate(samples, schema="../schemas/samples.schema.yaml")
-
-units = (
-    pd.read_csv(config["units"], sep="\t", dtype={"sample_name": str, "unit_name": str})
-    .set_index(["sample_name", "unit_name"], drop=False)
-    .sort_index()
-)
-validate(units, schema="../schemas/units.schema.yaml")
-
-
-wildcard_constraints:
-    sample="|".join(samples["sample_name"]),
-    unit="|".join(units["unit_name"]),
+# convert annot into dictionary for parametrization of rules, by deduplicating by sample_name (should only differ by bam_file)
+annot_samples = annot.drop_duplicates(subset='sample_name', keep='first')#.set_index("sample_name")
+samples = annot_samples.to_dict(orient="index")
 
 ##### set global variables
 result_path = os.path.join(config["result_path"], module_name)
+resource_path = os.path.join('resources',config["project_name"], module_name)
 
-
+envs = ["biomart", "gffutils", "pandas", "rseqc"]
 
 ##### load rules #####
 include: "rules/common.smk"
@@ -59,4 +46,19 @@ include: "rules/quantification.smk"
 ##### target rules #####
 rule all:
     input:
-        get_final_output(),
+        # PROCESSING
+        multiqc_report = os.path.join(result_path,"qc","multiqc_report.html"),
+        # QUANTIFICATION
+        counts = os.path.join(result_path, "counts", "counts.csv") # before: ("results/counts/all.symbol.tsv")
+        # sample_annotation = os.path.join(result_path, "counts", "sample_annotation.csv"),
+        # ANNOTATION
+        # gene_annotation = os.path.join(result_path,'counts',"gene_annotation.csv"),
+        # EXPORT environments and configurations
+        # envs = expand(os.path.join(result_path,'envs','{env}.yaml'),env=envs),
+        # configs = os.path.join(result_path,'configs','{}_config.yaml'.format(config["project_name"])),
+        # annotations = os.path.join(result_path,'configs','{}_annot.csv'.format(config["project_name"])),
+    resources:
+        mem_mb=config.get("mem", "8000"),
+    threads: config.get("threads", 1)
+    log:
+        os.path.join("logs","rules","all.log")

@@ -5,9 +5,11 @@ description: snakemake configuration file
 type: object
 
 properties:
-  samples:
+  project_name:
     type: string
-  units:
+  result_path:
+    type: string
+  annotation:
     type: string
 
   ref:
@@ -47,8 +49,9 @@ properties:
       - star
 
 required:
-  - samples
-  - units
+  - project_name
+  - result_path
+  - annotation
   - ref
-  - params
   - trimming
+  - params

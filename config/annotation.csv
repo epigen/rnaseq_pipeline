@@ -1,0 +1,7 @@
+﻿sample_name,read_type,bam_file,adapters,strandedness
+A,single,A.1.bam,,
+A,single,A2.bam,,
+B,single,B.bam,,
+C,single,C.bam,,
+D,single,D.bam,,
+E,single,E.bam,,
