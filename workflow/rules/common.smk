@@ -1,15 +1,4 @@
-import glob
 
-import pandas as pd
-from snakemake.utils import validate
-
-validate(config, schema="../schemas/config.schema.yaml")
-
-samples = (
-    pd.read_csv(config["samples"], sep="\t", dtype={"sample_name": str})
-    .set_index("sample_name", drop=False)
-    .sort_index()
-)
 
 
 def get_final_output():
@@ -32,22 +21,6 @@ def get_final_output():
             expand("results/pca.{variable}.svg", variable=pca_variables)
         )
     return final_output
-
-
-validate(samples, schema="../schemas/samples.schema.yaml")
-
-units = (
-    pd.read_csv(config["units"], sep="\t", dtype={"sample_name": str, "unit_name": str})
-    .set_index(["sample_name", "unit_name"], drop=False)
-    .sort_index()
-)
-validate(units, schema="../schemas/units.schema.yaml")
-
-
-wildcard_constraints:
-    sample="|".join(samples["sample_name"]),
-    unit="|".join(units["unit_name"]),
-
 
 def get_cutadapt_input(wildcards):
     unit = units.loc[wildcards.sample].loc[wildcards.unit]
@@ -149,12 +122,6 @@ def get_strandedness(units):
         return strand_list * units.shape[0]
 
 
-def get_deseq2_threads(wildcards=None):
-    # https://twitter.com/mikelove/status/918770188568363008
-    few_coeffs = False if wildcards is None else len(get_contrast(wildcards)) < 10
-    return 1 if len(samples) < 100 or few_coeffs else 6
-
-
 def is_activated(xpath):
     c = config
     for entry in xpath.split("/"):
@@ -187,5 +154,3 @@ def get_fastqs(wc):
     return units.loc[wc.sample, fq].tolist()
 
 
-def get_contrast(wildcards):
-    return config["diffexp"]["contrasts"][wildcards.contrast]

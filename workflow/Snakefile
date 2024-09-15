@@ -1,38 +1,62 @@
+
+##### global workflow dependencies #####
+conda: "envs/global.yaml"
+
+# libraries
+import glob
+import pandas as pd
+from snakemake.utils import validate
 from snakemake.utils import min_version
 
-##### set minimum snakemake version #####
-min_version("8.8.0")
+##### set module name #####
+module_name = "rnaseq_pipeline"
 
+##### set minimum snakemake version #####
+min_version("8.20.1")
 
 ##### setup report #####
-configfile: "config/config.yaml"
-
-
 report: "report/workflow.rst"
 
+##### load config and sample annotation sheets #####
+configfile: "config/config.yaml"
 
-##### setup singularity #####
+# TODO load annot etc
+validate(config, schema="../schemas/config.schema.yaml")
+
+samples = (
+    pd.read_csv(config["samples"], sep="\t", dtype={"sample_name": str})
+    .set_index("sample_name", drop=False)
+    .sort_index()
+)
+
+validate(samples, schema="../schemas/samples.schema.yaml")
+
+units = (
+    pd.read_csv(config["units"], sep="\t", dtype={"sample_name": str, "unit_name": str})
+    .set_index(["sample_name", "unit_name"], drop=False)
+    .sort_index()
+)
+validate(units, schema="../schemas/units.schema.yaml")
 
 
-# this container defines the underlying OS for each job when using the workflow
-# with --use-conda --use-singularity
-container: "docker://continuumio/miniconda3"
+wildcard_constraints:
+    sample="|".join(samples["sample_name"]),
+    unit="|".join(units["unit_name"]),
+
+##### set global variables
+result_path = os.path.join(config["result_path"], module_name)
+
 
 
 ##### load rules #####
-
-
 include: "rules/common.smk"
 include: "rules/ref.smk"
 include: "rules/trim.smk"
 include: "rules/qc.smk"
 include: "rules/align.smk"
-include: "rules/diffexp.smk"
-
+include: "rules/quantification.smk"
 
 ##### target rules #####
-
-
 rule all:
     input:
         get_final_output(),

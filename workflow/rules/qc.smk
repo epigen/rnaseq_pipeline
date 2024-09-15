@@ -66,7 +66,6 @@ rule rseqc_stat:
     shell:
         "bam_stat.py -i {input} > {output} 2> {log}"
 
-
 rule rseqc_infer:
     input:
         bam="results/star/{sample}_{unit}/Aligned.sortedByCoord.out.bam",

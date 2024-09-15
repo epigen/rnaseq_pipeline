@@ -2,13 +2,6 @@
 
 To configure this workflow, modify `config/config.yaml` according to your needs, following the explanations provided in the file.
 
-## `DESeq2` differential expression analysis configuration
-
-To successfully run the differential expression analysis, you will need to tell DESeq2 which sample annotations to use (annotations are columns in the `samples.tsv` file described below).
-This is done in the `config.yaml` file with the entries under `diffexp:`.
-The comments for the entries should give all the necessary infos and linkouts.
-But if in doubt, please also consult the [`DESeq2` manual](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html).
-
 # Sample and unit setup
 
 The sample and unit setup is specified via tab-separated tabular files (`.tsv`).

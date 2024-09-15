@@ -1,12 +1,3 @@
-rule get_sra:
-    output:
-        "sra/{accession}_1.fastq",
-        "sra/{accession}_2.fastq",
-    log:
-        "logs/get-sra/{accession}.log",
-    wrapper:
-        "v3.5.3/bio/sra-tools/fasterq-dump"
-
 
 rule cutadapt_pipe:
     input:
