@@ -1,0 +1,64 @@
+
+##### global workflow dependencies #####
+# conda: "envs/global.yaml"
+
+# libraries
+import glob
+import pandas as pd
+from snakemake.utils import validate
+from snakemake.utils import min_version
+
+##### set module name #####
+module_name = "rnaseq_pipeline"
+
+##### set minimum snakemake version #####
+min_version("8.20.1")
+
+##### setup report #####
+report: "report/workflow.rst"
+
+##### load and validate config and sample annotation sheets #####
+configfile: "config/config.yaml"
+# validate(config, schema="./schemas/config.schema.yaml")
+
+# load sample/unit annotation
+annot = pd.read_csv(config["annotation"], dtype={"sample_name": str}).set_index("sample_name", drop=False).sort_index()
+# validate(annot, schema="./schemas/annotation.schema.yaml")
+
+# convert annot into dictionary for parametrization of rules, by deduplicating by sample_name (should only differ by bam_file)
+annot_samples = annot.drop_duplicates(subset='sample_name', keep='first')#.set_index("sample_name")
+samples = annot_samples.to_dict(orient="index")
+
+##### set global variables
+result_path = os.path.join(config["result_path"], module_name)
+resource_path = os.path.join('resources',config["project_name"], module_name)
+
+envs = ["biomart", "gffutils", "pandas", "rseqc", "star"]
+
+##### load rules #####
+include: os.path.join("rules", "common.smk")
+include: os.path.join("rules", "ref.smk")
+include: os.path.join("rules", "qc.smk")
+include: os.path.join("rules", "processing.smk")
+include: os.path.join("rules", "quantification.smk")
+# include: os.path.join("rules", "export.smk")
+
+##### target rules #####
+rule all:
+    input:
+        # PROCESSING
+        multiqc_report = os.path.join(result_path,"qc","multiqc_report.html"),
+        # QUANTIFICATION
+        counts = os.path.join(result_path, "counts", "counts.csv"),
+        # sample_annotation = os.path.join(result_path, "counts", "sample_annotation.csv"),
+        # ANNOTATION
+        # gene_annotation = os.path.join(result_path,'counts',"gene_annotation.csv"),
+        # EXPORT environments and configurations
+        # envs = expand(os.path.join(result_path,'envs','{env}.yaml'),env=envs),
+        # configs = os.path.join(result_path,'configs','{}_config.yaml'.format(config["project_name"])),
+        # annotations = os.path.join(result_path,'configs','{}_annot.csv'.format(config["project_name"])),
+    resources:
+        mem_mb=config.get("mem", "8000"),
+    threads: config.get("threads", 1)
+    log:
+        os.path.join("logs","rules","all.log")
