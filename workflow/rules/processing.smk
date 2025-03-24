@@ -5,6 +5,7 @@
 rule trim_filter:
     input:
         bams = lambda wc: annot.loc[wc.sample, "bam_file"],
+        adapter_fasta = config["adapter_fasta"] if config["adapter_fasta"]!="" else []
     output:
         fastq_filtered_R1 = temp(os.path.join(result_path,"fastp","{sample}","{sample}_R1.filtered.fastq.gz")),
         fastq_filtered_R2 = temp(os.path.join(result_path,"fastp","{sample}","{sample}_R2.filtered.fastq.gz")),
@@ -18,8 +19,9 @@ rule trim_filter:
         fastq_opts = lambda wc: "-N" if samples[wc.sample]['read_type'] == 'paired' else "",
         samtools_threads = lambda wc, threads: int(threads) - 1,
         # fastp adapter trimming and filtering args
-        interleaved_in = lambda wc: "--interleaved_in" if samples[wc.sample]['read_type'] == 'paired' else "",
         fastp_args = config["fastp_args"] if config["fastp_args"] != "" else "",
+        adapter_fasta = "--adapter_fasta " + config["adapter_fasta"] if config["adapter_fasta"] !="" else "",
+        interleaved_in = lambda wc: "--interleaved_in" if samples[wc.sample]['read_type'] == 'paired' else "",
     threads: 10
     resources:
             mem_mb=config.get("mem", "16000"),
@@ -31,7 +33,7 @@ rule trim_filter:
         """
         samtools merge --threads {params.samtools_threads} -u - "{input.bams}" 2>> "{output.samtools_log}" | \
         samtools fastq --threads {params.samtools_threads} {params.fastq_opts} - 2>> "{output.samtools_log}" | \
-        fastp {params.fastp_args} {params.interleaved_in} --thread {threads} --stdin --stdout  --html "{output.fastp_html}" --json "{output.fastp_json}" 2> "{output.fastp_log}" | \
+        fastp {params.fastp_args} {params.adapter_fasta} {params.interleaved_in} --thread {threads} --stdin --stdout  --html "{output.fastp_html}" --json "{output.fastp_json}" 2> "{output.fastp_log}" | \
         {{
           if [ "{params.read_type}" = "PE" ]; then
               # For paired-end: de-interleave the FASTQ output and compress R1 and R2
