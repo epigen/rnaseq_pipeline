@@ -35,6 +35,6 @@ for t, sample in zip(counts, snakemake.params.samples):
 
 matrix = pd.concat(counts, axis=1)
 matrix.index.name = "gene"
-# collapse technical replicates
-matrix = matrix.groupby(matrix.columns, axis=1, sort=False).sum()
+# collapse technical replicates -> already down during processing (BAM files with same sample_name are merged)
+# matrix = matrix.groupby(matrix.columns, axis=1, sort=False).sum()
 matrix.to_csv(snakemake.output[0])

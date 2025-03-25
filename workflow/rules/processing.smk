@@ -11,8 +11,6 @@ rule trim_filter:
         fastq_filtered_R2 = temp(os.path.join(result_path,"fastp","{sample}","{sample}_R2.filtered.fastq.gz")),
         fastp_html = os.path.join(result_path,"fastp","{sample}","{sample}.fastp.html"),
         fastp_json = os.path.join(result_path,"fastp","{sample}","{sample}.fastp.json"),
-        fastp_log = os.path.join(result_path,"fastp","{sample}","{sample}.fastp.log"),
-        samtools_log = os.path.join(result_path,"fastp","{sample}","{sample}.samtools.log"),
     params:
         read_type = lambda wc: 'SE' if samples[wc.sample]['read_type'] == 'single' else 'PE',
         # samtools fastq args
@@ -26,14 +24,15 @@ rule trim_filter:
     resources:
             mem_mb=config.get("mem", "16000"),
     log:
-        "logs/rules/trim_filter_{sample}.log"
+        samtools = "logs/samtools/{sample}.log",
+        fastp = "logs/fastp/{sample}.log",
     conda:
         "../envs/fastp.yaml"
     shell:
         """
-        samtools merge --threads {params.samtools_threads} -u - "{input.bams}" 2>> "{output.samtools_log}" | \
-        samtools fastq --threads {params.samtools_threads} {params.fastq_opts} - 2>> "{output.samtools_log}" | \
-        fastp {params.fastp_args} {params.adapter_fasta} {params.interleaved_in} --thread {threads} --stdin --stdout  --html "{output.fastp_html}" --json "{output.fastp_json}" 2> "{output.fastp_log}" | \
+        samtools merge --threads {params.samtools_threads} -u - "{input.bams}" 2>> "{log.samtools}" | \
+        samtools fastq --threads {params.samtools_threads} {params.fastq_opts} - 2>> "{log.samtools}" | \
+        fastp {params.fastp_args} {params.adapter_fasta} {params.interleaved_in} --thread {threads} --stdin --stdout  --html "{output.fastp_html}" --json "{output.fastp_json}" 2> "{log.fastp}" | \
         {{
           if [ "{params.read_type}" = "PE" ]; then
               # For paired-end: de-interleave the FASTQ output and compress R1 and R2
@@ -46,7 +45,7 @@ rule trim_filter:
         }}
         """
 
-# align reads directly from trimmed and filtered BAM files
+# align reads directly from trimmed and filtered gzipped FASTQ files
 rule align:
     input:
         fastq_filtered_R1 = os.path.join(result_path,"fastp","{sample}","{sample}_R1.filtered.fastq.gz"),
@@ -85,5 +84,5 @@ rule align:
              > {log} 2>&1
 
         # index BAM file
-        # samtools index --threads {params.samtools_threads} "{output.bam}" "{output.bai}"
+        samtools index --threads {params.samtools_threads} "{output.bam}" "{output.bai}"
         """

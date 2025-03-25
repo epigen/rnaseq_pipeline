@@ -1,12 +1,11 @@
-## RSEQC
-
+## RSEQC & MultiQC
 
 rule rseqc_gtf2bed:
     input:
         os.path.join(resource_path,"genome.gtf"),
     output:
-        bed=os.path.join(result_path,"qc/rseqc/annotation.bed"),
-        db=temp(os.path.join(result_path,"qc/rseqc/annotation.db")),
+        bed=os.path.join(result_path,"rseqc/annotation.bed"),
+        db=temp(os.path.join(result_path,"rseqc/annotation.db")),
     log:
         "logs/rseqc_gtf2bed.log",
     conda:
@@ -18,9 +17,9 @@ rule rseqc_gtf2bed:
 rule rseqc_junction_annotation:
     input:
         bam=os.path.join(result_path,"star/{sample}/Aligned.sortedByCoord.out.bam"),
-        bed=os.path.join(result_path,"qc/rseqc/annotation.bed"),
+        bed=os.path.join(result_path,"rseqc/annotation.bed"),
     output:
-        os.path.join(result_path,"qc/rseqc/{sample}.junctionanno.junction.bed"),
+        os.path.join(result_path,"rseqc/{sample}.junctionanno.junction.bed"),
     priority: 1
     log:
         "logs/rseqc/rseqc_junction_annotation/{sample}.log",
@@ -37,9 +36,9 @@ rule rseqc_junction_annotation:
 rule rseqc_junction_saturation:
     input:
         bam=os.path.join(result_path,"star/{sample}/Aligned.sortedByCoord.out.bam"),
-        bed=os.path.join(result_path,"qc/rseqc/annotation.bed"),
+        bed=os.path.join(result_path,"rseqc/annotation.bed"),
     output:
-        os.path.join(result_path,"qc/rseqc/{sample}.junctionsat.junctionSaturation_plot.pdf"),
+        os.path.join(result_path,"rseqc/{sample}.junctionsat.junctionSaturation_plot.pdf"),
     priority: 1
     log:
         "logs/rseqc/rseqc_junction_saturation/{sample}.log",
@@ -57,7 +56,7 @@ rule rseqc_stat:
     input:
         os.path.join(result_path,"star/{sample}/Aligned.sortedByCoord.out.bam"),
     output:
-        os.path.join(result_path,"qc/rseqc/{sample}.stats.txt"),
+        os.path.join(result_path,"rseqc/{sample}.stats.txt"),
     priority: 1
     log:
         "logs/rseqc/rseqc_stat/{sample}.log",
@@ -69,9 +68,9 @@ rule rseqc_stat:
 rule rseqc_infer:
     input:
         bam=os.path.join(result_path,"star/{sample}/Aligned.sortedByCoord.out.bam"),
-        bed=os.path.join(result_path,"qc/rseqc/annotation.bed"),
+        bed=os.path.join(result_path,"rseqc/annotation.bed"),
     output:
-        os.path.join(result_path,"qc/rseqc/{sample}.infer_experiment.txt"),
+        os.path.join(result_path,"rseqc/{sample}.infer_experiment.txt"),
     priority: 1
     log:
         "logs/rseqc/rseqc_infer/{sample}.log",
@@ -84,9 +83,9 @@ rule rseqc_infer:
 rule rseqc_innerdis:
     input:
         bam=os.path.join(result_path,"star/{sample}/Aligned.sortedByCoord.out.bam"),
-        bed=os.path.join(result_path,"qc/rseqc/annotation.bed"),
+        bed=os.path.join(result_path,"rseqc/annotation.bed"),
     output:
-        os.path.join(result_path,"qc/rseqc/{sample}.inner_distance_freq.inner_distance.txt"),
+        os.path.join(result_path,"rseqc/{sample}.inner_distance_freq.inner_distance.txt"),
     priority: 1
     log:
         "logs/rseqc/rseqc_innerdis/{sample}.log",
@@ -101,9 +100,9 @@ rule rseqc_innerdis:
 rule rseqc_readdis:
     input:
         bam=os.path.join(result_path,"star/{sample}/Aligned.sortedByCoord.out.bam"),
-        bed=os.path.join(result_path,"qc/rseqc/annotation.bed"),
+        bed=os.path.join(result_path,"rseqc/annotation.bed"),
     output:
-        os.path.join(result_path,"qc/rseqc/{sample}.readdistribution.txt"),
+        os.path.join(result_path,"rseqc/{sample}.readdistribution.txt"),
     priority: 1
     log:
         "logs/rseqc/rseqc_readdis/{sample}.log",
@@ -117,7 +116,7 @@ rule rseqc_readdup:
     input:
         os.path.join(result_path,"star/{sample}/Aligned.sortedByCoord.out.bam"),
     output:
-        os.path.join(result_path,"qc/rseqc/{sample}.readdup.DupRate_plot.pdf"),
+        os.path.join(result_path,"rseqc/{sample}.readdup.DupRate_plot.pdf"),
     priority: 1
     log:
         "logs/rseqc/rseqc_readdup/{sample}.log",
@@ -133,7 +132,7 @@ rule rseqc_readgc:
     input:
         os.path.join(result_path,"star/{sample}/Aligned.sortedByCoord.out.bam"),
     output:
-        os.path.join(result_path,"qc/rseqc/{sample}.readgc.GC_plot.pdf"),
+        os.path.join(result_path,"rseqc/{sample}.readgc.GC_plot.pdf"),
     priority: 1
     log:
         "logs/rseqc/rseqc_readgc/{sample}.log",
@@ -148,39 +147,43 @@ rule rseqc_readgc:
 rule multiqc:
     input:
         expand(
+            os.path.join(result_path,"fastp","{sample}","{sample}.fastp.json"), #"logs/fastp/{sample}.log",
+            sample=list(samples.keys()),
+        ),
+        expand(
             os.path.join(result_path,"star/{sample}/Aligned.sortedByCoord.out.bam"),
             sample=list(samples.keys()),
         ),
         expand(
-            os.path.join(result_path,"qc/rseqc/{sample}.junctionanno.junction.bed"),
+            os.path.join(result_path,"rseqc/{sample}.junctionanno.junction.bed"),
             sample=list(samples.keys()),
         ),
         expand(
-            os.path.join(result_path,"qc/rseqc/{sample}.junctionsat.junctionSaturation_plot.pdf"),
+            os.path.join(result_path,"rseqc/{sample}.junctionsat.junctionSaturation_plot.pdf"),
             sample=list(samples.keys()),
         ),
         expand(
-            os.path.join(result_path,"qc/rseqc/{sample}.infer_experiment.txt"),
+            os.path.join(result_path,"rseqc/{sample}.infer_experiment.txt"),
             sample=list(samples.keys()),
         ),
         expand(
-            os.path.join(result_path,"qc/rseqc/{sample}.stats.txt"),
+            os.path.join(result_path,"rseqc/{sample}.stats.txt"),
             sample=list(samples.keys()),
         ),
         expand(
-            os.path.join(result_path,"qc/rseqc/{sample}.inner_distance_freq.inner_distance.txt"),
+            os.path.join(result_path,"rseqc/{sample}.inner_distance_freq.inner_distance.txt"),
             sample=list(samples.keys()),
         ),
         expand(
-            os.path.join(result_path,"qc/rseqc/{sample}.readdistribution.txt"),
+            os.path.join(result_path,"rseqc/{sample}.readdistribution.txt"),
             sample=list(samples.keys()),
         ),
         expand(
-            os.path.join(result_path,"qc/rseqc/{sample}.readdup.DupRate_plot.pdf"),
+            os.path.join(result_path,"rseqc/{sample}.readdup.DupRate_plot.pdf"),
             sample=list(samples.keys()),
         ),
         expand(
-            os.path.join(result_path,"qc/rseqc/{sample}.readgc.GC_plot.pdf"),
+            os.path.join(result_path,"rseqc/{sample}.readgc.GC_plot.pdf"),
             sample=list(samples.keys()),
         ),
         expand(
@@ -188,8 +191,9 @@ rule multiqc:
             sample=list(samples.keys()),
         ),
     output:
-        os.path.join(result_path,"qc/multiqc_report.html"),
+        os.path.join(result_path,"report","multiqc_report.html"),
+        directory(os.path.join(result_path,"report","multiqc_report_data")),
     log:
-        "logs/multiqc.log",
+        "logs/rules/multiqc.log",
     wrapper:
-        "v3.5.3/bio/multiqc"
+        "v5.9.0/bio/multiqc"

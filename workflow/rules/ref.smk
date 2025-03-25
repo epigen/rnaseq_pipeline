@@ -1,8 +1,10 @@
+# Get all references and prepare them accordingly
+
 rule get_genome:
     output:
         os.path.join(resource_path,"genome.fasta"),
     log:
-        "logs/get-genome.log",
+        "logs/rules/get_genome.log",
     params:
         species=config["ref"]["species"],
         datatype="dna",
@@ -24,7 +26,7 @@ rule get_annotation:
         flavor="",
     cache: True
     log:
-        "logs/get_annotation.log",
+        "logs/rules/get_annotation.log",
     wrapper:
         "v3.5.3/bio/reference/ensembl-annotation"
 
@@ -35,7 +37,7 @@ rule genome_faidx:
     output:
         os.path.join(resource_path,"genome.fasta.fai"),
     log:
-        "logs/genome-faidx.log",
+        "logs/rules/genome_faidx.log",
     cache: True
     wrapper:
         "v3.5.3/bio/samtools/faidx"
@@ -47,7 +49,7 @@ rule bwa_index:
     output:
         multiext(os.path.join(resource_path,"genome.fasta", ".amb", ".ann", ".bwt", ".pac", ".sa")),
     log:
-        "logs/bwa_index.log",
+        "logs/rules/bwa_index.log",
     resources:
         mem_mb=369000,
     cache: True
@@ -62,12 +64,12 @@ rule star_index:
     output:
         directory(os.path.join(resource_path,"star_genome")),
     resources:
-        mem_mb=config.get("mem", "16000"),
-    threads: 4
+        mem_mb=4*int(config.get("mem", "16000")),
+    threads: 8
     params:
         extra=lambda wc, input: f"--sjdbGTFfile {input.annotation} --sjdbOverhang 100",
     log:
-        "logs/star_index_genome.log",
+        "logs/rules/star_index_genome.log",
     cache: True
     wrapper:
         "v3.5.3/bio/star/index"

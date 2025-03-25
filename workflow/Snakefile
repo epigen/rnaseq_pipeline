@@ -33,26 +33,18 @@ samples = annot_samples.to_dict(orient="index")
 result_path = os.path.join(config["result_path"], module_name)
 resource_path = os.path.join('resources',config["project_name"], module_name)
 
-envs = ["biomart", "gffutils", "pandas", "rseqc", "star"]
-
-##### load rules #####
-include: os.path.join("rules", "common.smk")
-include: os.path.join("rules", "ref.smk")
-include: os.path.join("rules", "qc.smk")
-include: os.path.join("rules", "processing.smk")
-include: os.path.join("rules", "quantification.smk")
-# include: os.path.join("rules", "export.smk")
+envs = ["biomart", "fastp", "gffutils", "pandas", "rseqc", "star"]
 
 ##### target rules #####
 rule all:
     input:
         # PROCESSING
-        multiqc_report = os.path.join(result_path,"qc","multiqc_report.html"),
+        multiqc_report = os.path.join(result_path,"report","multiqc_report.html"),
         # QUANTIFICATION
         counts = os.path.join(result_path, "counts", "counts.csv"),
-        # sample_annotation = os.path.join(result_path, "counts", "sample_annotation.csv"),
+        sample_annotation = os.path.join(result_path, "counts", "sample_annotation.csv"),
         # ANNOTATION
-        # gene_annotation = os.path.join(result_path,'counts',"gene_annotation.csv"),
+        gene_annotation = os.path.join(result_path,'counts',"gene_annotation.csv"),
         # EXPORT environments and configurations
         # envs = expand(os.path.join(result_path,'envs','{env}.yaml'),env=envs),
         # configs = os.path.join(result_path,'configs','{}_config.yaml'.format(config["project_name"])),
@@ -62,3 +54,11 @@ rule all:
     threads: config.get("threads", 1)
     log:
         os.path.join("logs","rules","all.log")
+
+##### load rules #####
+include: os.path.join("rules", "common.smk")
+include: os.path.join("rules", "ref.smk")
+include: os.path.join("rules", "qc.smk")
+include: os.path.join("rules", "processing.smk")
+include: os.path.join("rules", "quantification.smk")
+# include: os.path.join("rules", "export.smk")
