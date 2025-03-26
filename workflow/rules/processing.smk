@@ -34,9 +34,10 @@ rule check_read_type:
               exit 1
             else
               echo "BAM file type matches expected type."
-              touch {output.check}
             fi
         done
+
+        touch {output.check}
         """
 
 # Merge uBAM files, convert to interleaved FASTQ, trim and filter using fastp, then de-interleave for alignment
@@ -71,7 +72,7 @@ rule trim_filter:
         "../envs/fastp.yaml"
     shell:
         """
-        samtools merge --threads {params.samtools_threads} -u - "{input.bams}" 2>> "{log.samtools}" | \
+        samtools merge --threads {params.samtools_threads} -u - {input.bams} 2>> "{log.samtools}" | \
         samtools fastq --threads {params.samtools_threads} {params.fastq_opts} - 2>> "{log.samtools}" | \
         fastp {params.fastp_args} {params.adapter_fasta} {params.interleaved_in} --thread {threads} --stdin --stdout  --html "{output.fastp_html}" --json "{output.fastp_json}" 2> "{log.fastp}" | \
         {{

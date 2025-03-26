@@ -5,6 +5,7 @@
 # libraries
 import glob
 import pandas as pd
+import yaml
 from snakemake.utils import validate
 from snakemake.utils import min_version
 
