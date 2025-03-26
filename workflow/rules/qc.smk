@@ -191,7 +191,14 @@ rule multiqc:
             sample=list(samples.keys()),
         ),
     output:
-        os.path.join(result_path,"report","multiqc_report.html"),
+        report(os.path.join(result_path,"report","multiqc_report.html"),
+               caption="../report/multiqc.rst",
+               category="{}_{}".format(config["project_name"], module_name),
+               subcategory="QC",
+               labels={
+                   "name": "MultiQC report",
+                   "type": "HTML",
+                   }),
         directory(os.path.join(result_path,"report","multiqc_report_data")),
     log:
         "logs/rules/multiqc.log",

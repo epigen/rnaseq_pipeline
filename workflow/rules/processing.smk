@@ -1,10 +1,51 @@
 
+# check for each sample's bam files if the provided read type (single or paired) is correct
+rule check_read_type:
+    input:
+        bams = lambda wc: annot.loc[wc.sample, "bam_file"],
+    output:
+        check = os.path.join(result_path,".check_read_type","{sample}.done"),
+    params:
+        read_type = lambda wc: 'SE' if samples[wc.sample]['read_type'] == 'single' else 'PE',
+        samtools_threads = lambda wc, threads: int(threads) - 1,
+    threads: 10
+    resources:
+            mem_mb=config.get("mem", "16000"),
+    log:
+        "logs/rules/check_read_type_{sample}.log",
+    conda:
+        "../envs/fastp.yaml"
+    shell:
+        """
+        for bam_file in {input.bams}; do
+            # Use samtools to count reads flagged as paired (flag 0x1)
+            paired_count=$(samtools view --threads {params.samtools_threads} -c -f 0x1 "$bam_file")
+
+            # If any reads have the paired flag, we consider the file paired-end.
+            if [ "$paired_count" -gt 0 ]; then
+              actual_type="PE"
+            else
+              actual_type="SE"
+            fi
+
+            # Compare the detected type with the expected type
+            if [ "$actual_type" != "{params.read_type}" ]; then
+              echo "Error: BAM file type ($actual_type) does not match expected type {params.read_type}. Exiting."
+              exit 1
+            else
+              echo "BAM file type matches expected type."
+              touch {output.check}
+            fi
+        done
+        """
+
 # Merge uBAM files, convert to interleaved FASTQ, trim and filter using fastp, then de-interleave for alignment
 # de-interleaving from here: https://gist.github.com/nathanhaigh/3521724
 # tested by comparing the output to seqfu interleave (https://telatin.github.io/seqfu2/tools/deinterleave.html)
 rule trim_filter:
     input:
         bams = lambda wc: annot.loc[wc.sample, "bam_file"],
+        read_type_check = os.path.join(result_path,".check_read_type","{sample}.done"),
         adapter_fasta = config["adapter_fasta"] if config["adapter_fasta"]!="" else []
     output:
         fastq_filtered_R1 = temp(os.path.join(result_path,"fastp","{sample}","{sample}_R1.filtered.fastq.gz")),

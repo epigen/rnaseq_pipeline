@@ -46,18 +46,18 @@ rule all:
         # ANNOTATION
         gene_annotation = os.path.join(result_path,'counts',"gene_annotation.csv"),
         # EXPORT environments and configurations
-        # envs = expand(os.path.join(result_path,'envs','{env}.yaml'),env=envs),
-        # configs = os.path.join(result_path,'configs','{}_config.yaml'.format(config["project_name"])),
-        # annotations = os.path.join(result_path,'configs','{}_annot.csv'.format(config["project_name"])),
+        envs = expand(os.path.join(result_path,'envs','{env}.yaml'),env=envs),
+        configs = os.path.join(result_path,'configs','{}_config.yaml'.format(config["project_name"])),
+        annotations = os.path.join(result_path,'configs','{}_annot.csv'.format(config["project_name"])),
     resources:
         mem_mb=config.get("mem", "8000"),
     log:
         os.path.join("logs","rules","all.log")
 
 ##### load rules #####
+include: os.path.join("rules", "export.smk")
 include: os.path.join("rules", "common.smk")
 include: os.path.join("rules", "ref.smk")
 include: os.path.join("rules", "qc.smk")
 include: os.path.join("rules", "processing.smk")
 include: os.path.join("rules", "quantification.smk")
-# include: os.path.join("rules", "export.smk")
