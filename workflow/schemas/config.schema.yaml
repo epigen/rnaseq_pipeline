@@ -1,0 +1,44 @@
+$schema: "http://json-schema.org/draft-06/schema#"
+
+description: snakemake configuration file
+
+type: object
+
+# General and Processing
+properties:
+  project_name:
+    type: string
+  result_path:
+    type: string
+  annotation:
+    type: string
+  adapter_fasta:
+    type: string
+  fastp_args:
+    type: string
+  star_args:
+    type: string
+
+# Resource references
+  ref:
+    type: object
+    properties:
+      species:
+        type: string
+      release:
+        type: integer
+      build:
+        type: string
+    required:
+      - species
+      - release
+      - build
+
+required:
+  - project_name
+  - result_path
+  - annotation
+  - ref
+  - adapter_fasta
+  - fastp_args
+  - star_args

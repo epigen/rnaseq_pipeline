@@ -2,12 +2,12 @@
 # quantify number of reads per gene across samples
 rule count_matrix:
     input:
-        expand(
+        reads_per_gene = expand(
             os.path.join(result_path,"star/{sample}/ReadsPerGene.out.tab"),
             sample=list(samples.keys()),
         ),
     output:
-       os.path.join(result_path,"counts","counts.csv"),
+       counts = os.path.join(result_path,"counts","counts.csv"),
     log:
         "logs/rules/count_matrix.log",
     params:

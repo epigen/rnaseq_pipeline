@@ -1,0 +1,21 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+description: row of the annotation.csv, representing a sequencing unit, i.e. single-end or paired-end data
+type: object
+properties:
+  sample_name:
+    type: string
+    description: sample name/id the unit has been sequenced from
+  read_type:
+    type: string
+    description:  one of the values 'single' or 'paired'
+  bam_file:
+    type: string
+    description: sequencing unit path to BAM file
+  strandedness:
+    type: string
+    description: one of the values 'none', 'yes' or 'reverse' according to protocol strandedness
+
+required:
+  - sample_name
+  - read_type
+  - bam_file

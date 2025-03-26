@@ -1,11 +1,24 @@
+
+# libraries
 import sys
+import pandas as pd
 
 # logging
 sys.stderr = open(snakemake.log[0], "w")
 
-import pandas as pd
+#### config
 
+# input
+reads_per_gene_list = snakemake.input
 
+# output
+counts_path = snakemake.output["counts"]
+
+# params
+samples = snakemake.params.samples
+strand = snakemake.params.strand
+
+# get column based on strandedness
 def get_column(strandedness):
     if pd.isnull(strandedness) or strandedness == "none":
         return 1  # non stranded protocol
@@ -22,19 +35,17 @@ def get_column(strandedness):
             ).format(repr(strandedness))
         )
 
-
+# aggregate and save counts across samples (read_per_genes files)
 counts = [
     pd.read_table(
         f, index_col=0, usecols=[0, get_column(strandedness)], header=None, skiprows=4
     )
-    for f, strandedness in zip(snakemake.input, snakemake.params.strand)
+    for f, strandedness in zip(reads_per_gene_list, strand)
 ]
 
-for t, sample in zip(counts, snakemake.params.samples):
+for t, sample in zip(counts, samples):
     t.columns = [sample]
 
 matrix = pd.concat(counts, axis=1)
 matrix.index.name = "gene"
-# collapse technical replicates -> already down during processing (BAM files with same sample_name are merged)
-# matrix = matrix.groupby(matrix.columns, axis=1, sort=False).sum()
-matrix.to_csv(snakemake.output[0])
+matrix.to_csv(counts_path)

@@ -12,21 +12,21 @@ from snakemake.utils import min_version
 module_name = "rnaseq_pipeline"
 
 ##### set minimum snakemake version #####
-min_version("8.20.1")
+min_version("8.25.3")
 
 ##### setup report #####
 report: "report/workflow.rst"
 
 ##### load and validate config and sample annotation sheets #####
 configfile: "config/config.yaml"
-# validate(config, schema="./schemas/config.schema.yaml")
+validate(config, schema="./schemas/config.schema.yaml")
 
 # load sample/unit annotation
 annot = pd.read_csv(config["annotation"], dtype={"sample_name": str}).set_index("sample_name", drop=False).sort_index()
-# validate(annot, schema="./schemas/annotation.schema.yaml")
+validate(annot, schema="./schemas/annotation.schema.yaml")
 
-# convert annot into dictionary for parametrization of rules, by deduplicating by sample_name (should only differ by bam_file)
-annot_samples = annot.drop_duplicates(subset='sample_name', keep='first')#.set_index("sample_name")
+# convert annot into dictionary, for parametrization of rules, by deduplicating by sample_name (should only differ by bam_file)
+annot_samples = annot.drop_duplicates(subset='sample_name', keep='first')
 samples = annot_samples.to_dict(orient="index")
 
 ##### set global variables
@@ -51,7 +51,6 @@ rule all:
         # annotations = os.path.join(result_path,'configs','{}_annot.csv'.format(config["project_name"])),
     resources:
         mem_mb=config.get("mem", "8000"),
-    threads: config.get("threads", 1)
     log:
         os.path.join("logs","rules","all.log")
 

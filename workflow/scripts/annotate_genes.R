@@ -57,7 +57,7 @@ getGeneLengthAndGCContent <- function(id, id.type, ensembl){
     )
 
     res <- cbind(len, gc.cont)
-    colnames(res) <- c("length", "gc")
+    colnames(res) <- c("exon_length", "exon_gc")
     rownames(res) <- id
 
     # (4) order according to input ids
@@ -132,7 +132,7 @@ while ( class(mart)[[1]] != "Mart" ) {
 }
 
 # get quantified Ensembl gene IDs
-df <- read.table(counts_path, sep=',', header=1)
+counts <- read.table(counts_path, sep=',', header=1)
 
 # annotate Ensembl gene IDs using biomaRt
 gene_annot <- biomaRt::getBM(
@@ -144,7 +144,7 @@ gene_annot <- biomaRt::getBM(
                             "description",
                             "gene_biotype"),
             filters = "ensembl_gene_id",
-            values = df$gene,
+            values = counts$gene,
             mart = mart,
             )
 

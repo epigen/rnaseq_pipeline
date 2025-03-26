@@ -45,7 +45,7 @@ rule trim_filter:
         }}
         """
 
-# align reads directly from trimmed and filtered gzipped FASTQ files
+# align reads directly from temporary, trimmed and filtered gzipped FASTQ files
 rule align:
     input:
         fastq_filtered_R1 = os.path.join(result_path,"fastp","{sample}","{sample}_R1.filtered.fastq.gz"),

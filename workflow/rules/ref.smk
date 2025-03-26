@@ -1,4 +1,4 @@
-# Get all references and prepare them accordingly
+# Get all references and prepare them accordingly for downstream processing
 
 rule get_genome:
     output:

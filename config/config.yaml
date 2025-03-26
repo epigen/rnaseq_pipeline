@@ -1,0 +1,39 @@
+
+##### RESOURCES #####
+# memory in MB
+mem: '32000'
+
+##### GENERAL #####
+project_name: MyRNAproject # name of the project/dataset
+result_path: /path/to/results/ # path to the output folder
+annotation: /path/to/MyRNAproject_rnaseq_pipeline_annotation.csv # path to annotation file, specified in config/README.md
+
+##### RESOURCES #####
+
+ref:
+  # Ensembl species name
+  species: homo_sapiens
+  # Ensembl release (make sure to take one where snpeff data is available, check 'snpEff databases' output)
+  release: 100
+  # Genome build
+  build: GRCh38
+
+##### PROCESSING #####
+
+# (nextera) adapter fasta (.fa) file and/or nucleotide adapter sequence of the used RNA-seq protocol (used by fastp for adapter triming, if provided)
+# if not available/applicable leave empty: ""
+adapter_fasta: path/to/adapters.fa
+
+# fastp specific arguments for adapter trimming and quality control filtering
+# see: https://github.com/OpenGene/fastp
+# useful parameters are --adapter_sequence GTCTCGTGGGCTCGG/auto TODO
+# or provide (nextera) adapter fasta (.fa) file and/or nucleotide adapter sequence of the used protocol --adapter_fasta path/to/adapters.fa
+fastp_args: "--adapter_sequence auto --detect_adapter_for_pe --trim_poly_g --cut_right --cut_window_size 4 --cut_mean_quality 20"
+
+# STAR aligner specific arguments
+# see: https://github.com/alexdobin/STAR
+star_args: ""
+
+
+
+

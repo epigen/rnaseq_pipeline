@@ -3,6 +3,6 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - samtools
-  - fastp
-  - pigz
+  - samtools=1.9
+  - fastp=0.22.0
+  - pigz=2.8
