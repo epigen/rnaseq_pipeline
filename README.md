@@ -3,6 +3,7 @@
 
 Note: fastp adapter auto-detection is disabled because we use STDIN mode (i.e., stream the data through pipes) to be disk space efficient.
 
+Note: Gene annotation takes a while as it depends on external data sources via accessed via biomaRt
 
 Note: GC-content and length are exon based(!)
 In poly(A)‑selected libraries, the sequencing reads mainly come from exonic regions.

@@ -13,6 +13,8 @@ rule count_matrix:
     params:
         samples=list(samples.keys()),
         strand=get_strandedness(annot_samples),
+    resources:
+        mem_mb=config.get("mem", "16000"),
     conda:
         "../envs/pandas.yaml"
     script:
@@ -28,7 +30,7 @@ rule annotate_genes:
         species=get_bioc_species_name(),
         version=config["ref"]["release"],
     resources:
-        mem_mb=config.get("mem", "16000"),
+        mem_mb="8000",
     log:
         "logs/rules/annotate_genes.log",
     conda:
