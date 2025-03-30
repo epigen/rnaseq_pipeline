@@ -99,7 +99,8 @@ rule align:
         bai = os.path.join(result_path,"star","{sample}","Aligned.sortedByCoord.out.bam.bai"),
         reads_per_gene = os.path.join(result_path,"star","{sample}","ReadsPerGene.out.tab"),
     resources:
-        mem_mb=config.get("mem", "16000"),
+        # dynamic memory allocation based on attempts (multiple attempts can be configured with --retries X)
+        mem_mb=lambda wildcards, attempt: attempt*int(config.get("mem", "16000")),
     threads: 24
     log:
         "logs/star/{sample}.log",
