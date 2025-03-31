@@ -15,7 +15,7 @@ A [Snakemake 8](https://snakemake.readthedocs.io/en/stable/) workflow for end-to
 > ⭐️ **Star and share modules you find valuable** 📤 - help others discover them, and guide our future work!
 
 > [!IMPORTANT]  
-> **If you use this workflow in a publication, please don't forget to give credit to the authors by citing it using this DOI [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) and acknowledging the [rna-seq-star-deseq2 workflow](https://github.com/snakemake-workflows/rna-seq-star-deseq2) DOI [10.5281/zenodo.4737358](https://doi.org/10.5281/zenodo.4737358) from which structure and code was adapted.**
+> **If you use this workflow in a publication, please don't forget to give credit to the authors by citing it using this DOI [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) and acknowledging the [rna-seq-star-deseq2 workflow](https://github.com/snakemake-workflows/rna-seq-star-deseq2) DOI [10.5281/zenodo.4737358](https://doi.org/10.5281/zenodo.4737358) from which structure and code were adapted.**
 
 ![Workflow Rulegraph](./workflow/dags/rulegraph.svg)
 
@@ -160,7 +160,8 @@ Below are some guidelines for the manual quality control of each sample using th
       - [Unsupervised Analysis](https://github.com/epigen/unsupervised_analysis) to explore sample relationships based on gene expression.
       - [Differential Analysis with limma](https://github.com/epigen/dea_limma) to identify differentially expressed genes between sample groups.
       - [Enrichment Analysis](https://github.com/epigen/enrichment_analysis) for biomedical interpretation of gene lists (e.g., from differential analysis).
-
+- [fastp manual](https://github.com/OpenGene/fastp/blob/master/README.md)
+- [STAR manual](https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf)
 
 # 📑 Publications
 The following publications successfully used this module for their analyses.
