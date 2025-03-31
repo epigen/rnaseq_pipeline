@@ -15,7 +15,7 @@ A [Snakemake 8](https://snakemake.readthedocs.io/en/stable/) workflow for end-to
 > ⭐️ **Star and share modules you find valuable** 📤 - help others discover them, and guide our future work!
 
 > [!IMPORTANT]  
-> **If you use this workflow in a publication, please don't forget to give credit to the authors by citing it using this DOI [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX).**
+> **If you use this workflow in a publication, please don't forget to give credit to the authors by citing it using this DOI [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) and acknowledging the [rna-seq-star-deseq2 workflow](https://github.com/snakemake-workflows/rna-seq-star-deseq2) DOI [10.5281/zenodo.4737358](https://doi.org/10.5281/zenodo.4737358) from which structure and code was adapted.**
 
 ![Workflow Rulegraph](./workflow/dags/rulegraph.svg)
 
@@ -83,11 +83,13 @@ The workflow performs the following steps that produce the outlined results:
       - Calculates **exon-based** GC content and cumulative exon length for each gene, suitable for poly(A) selected libraries (e.g., .
       > [!NOTE]
       > Gene annotation can take a while since it depends on the availability of external data sources accessed via `biomaRt`.
-      > GC-content and length are **exon-based**: In poly(A)‑selected libraries (such as Illumina TruSeq, SMART‑Seq or QuantSeq), the sequencing reads mainly come from exonic regions. Therefore, potential correction for GC bias and gene length should ideally use exon‑level GC content and effective exon length rather than whole‑gene metrics that include introns.
+      > GC-content and length are **exon-based**: In poly(A)‑selected libraries (such as Illumina TruSeq, Smart-seq or QuantSeq), the sequencing reads mainly come from exonic regions. Therefore, potential correction for GC bias and gene length should ideally use exon‑level GC content and effective exon length rather than whole‑gene metrics that include introns.
     - Outputs a sample annotation table containing sample-wise general MultiQC statistics (`counts/sample_annotation.csv`).
 - **QC & Reporting:**
     - Employs RSeQC tools to generate key quality metrics like strand specificity and read distribution across genomic features (`rseqc/`).
     - Aggregates QC metrics from fastp, STAR and RSeQC into a single report using MultiQC (`report/multiqc_report.html`) with [AI summaries](https://seqera.io/blog/ai-summaries-multiqc/).
+
+---
 
 The workflow produces the following directory structure:
 ```
@@ -105,6 +107,9 @@ The workflow produces the following directory structure:
     ├── envs/                           # Exported Conda environment specifications
     └── configs/                        # Exported configuration and annotation files used for the run
 ```
+> [!IMPORTANT]  
+> Resources are downloaded automatically to `resources/{config::project_name}/rnaseq_pipeline/)`, are large (>`3GB`) and have to be manually removed if not needed anymore.
+
 
 # 🛠️ Usage
 
@@ -127,7 +132,7 @@ Explore detailed examples showcasing module usage in comprehensive end-to-end an
 # 🔍 Quality Control
 Below are some guidelines for the manual quality control of each sample using the generated `MultiQC` report, but keep in mind that every experiment/dataset is different. Thresholds are general suggestions and may vary based on experiment type, organism, and library prep.
 
-- **Alignment Rate (STAR):** % Uniquely Mapped Reads > 70-80%. Low rates might indicate contamination or reference issues.
+- **Alignment Rate (STAR):** % (Uniquely) Mapped Reads > 70-80%. Low rates might indicate contamination or reference issues.
 - **Alignment Scores & Gene Counts (STAR):** High proportion of uniquely mapped reads assigned to exonic regions (e.g., >60-70% for poly(A) mRNA-seq). Low rates could suggest gDNA contamination or high intronic reads. In case of many intronic reads or non-poly(A) mRNA-seq protocols do not use exon-based gene annotations (gc-content and length).
 - **Read Quality (fastp):** High average quality scores across reads after trimming. Ensure effective adapter removal.
 - **Library Complexity (fastp/RSeQC):** % Duplication Rate should not be excessively high (highly variable, interpret in context of expression). Very high rates might indicate low input or PCR issues.

@@ -1,51 +1,13 @@
+# Configuration
 
-Whitespaces in file names forbidden.
+You need one configuration file (`config.yaml`) and one annotation file (`annotation.csv`) to run the complete workflow. You can use the provided examples as starting point. If in doubt read the comments in the config and/or try the default values.
 
+- project configuration (`config/config.yaml`): different for every project/dataset and configures the processing and quantification. The fields are described within the file.
+- annotation file (`annotation.csv`): `CSV` file consisting of one technical sequencing unit per row (i.e., one sample can include multiple sequencing units e.g., if you have several runs or lanes per sample, hence mutliple rows per sample) and 4 mandatory columns:
+  - sample_name: No whitespace, special characters, or hyphen (`-`) etc. allowed. We recommend `snake_case`.
+  - read_type: "single" or "paired"
+  - bam_file: path to the raw/unaligned/unmapped [uBAM](https://gatk.broadinstitute.org/hc/en-us/articles/360035532132-uBAM-Unmapped-BAM-Format) files. No whitespaces in file paths of names allowed.
+  - strandedness: To get the correct `geneCounts` from `STAR` output, you can provide information on the strandedness of the library preparation protocol used for a unit. `STAR` can produce counts for unstranded (`none` - this is the default, e.g., Smart-seq2), forward oriented (`yes` e.g., QuantSeq) and reverse oriented (`reverse`) protocols. 
+  - (optional) additional sample metadata columns can be added and will be included on a sample-basis in the output sample annotation file.
 
-# General configuration
-
-To configure this workflow, modify `config/config.yaml` according to your needs, following the explanations provided in the file.
-
-# Sample and unit setup
-
-The sample and unit setup is specified via tab-separated tabular files (`.tsv`).
-Missing values can be specified by empty columns or by writing `NA`.
-
-## sample sheet
-
-The default sample sheet is `config/samples.tsv` (as configured in `config/config.yaml`).
-Each sample refers to an actual physical sample, and replicates (both biological and technical) may be specified as separate samples.
-For each sample, you will always have to specify a `sample_name`.
-In addition, all `variables_of_interest` and `batch_effects` specified in the `config/config.yaml` under the `diffexp:` entry, will have to have corresponding columns in the `config/samples.tsv`.
-Finally, the sample sheet can contain any number of additional columns.
-So if in doubt about whether you might at some point need some metadata you already have at hand, just put it into the sample sheet already---your future self will thank you.
-
-## unit sheet
-
-The default unit sheet is `config/units.tsv` (as configured in `config/config.yaml`).
-For each sample, add one or more sequencing units (for example if you have several runs or lanes per sample).
-
-### `.fastq` file source
-
-For each unit, you will have to define a source for your `.fastq` files.
-This can be done via the columns `fq1`, `fq2` and `sra`, with either of:
-1. A single `.fastq` file for single-end reads (`fq1` column only; `fq2` and `sra` columns present, but empty).
-  The entry can be any path on your system, but we suggest something like a `raw/` data directory within your analysis directory.
-2. Two `.fastq` files for paired-end reads (columns `fq1` and `fq2`; column `sra` present, but empty).
-  As for the `fq1` column, the `fq2` column can also point to anywhere on your system.
-3. A sequence read archive (SRA) accession number (`sra` column only; `fq1` and `fq2` columns present, but empty).
-  The workflow will automatically download the corresponding `.fastq` data (currently assumed to be paired-end).
-  The accession numbers usually start with SRR or ERR and you can find accession numbers for studies of interest with the [SRA Run Selector](https://trace.ncbi.nlm.nih.gov/Traces/study/).
-If both local files and an SRA accession are specified for the same unit, the local files will be used.
-
-### adapter trimming
-
-If you set `trimming: activate:` in the `config/config.yaml` to `True`, you will have to provide at least one `cutadapt` adapter argument for each unit in the `adapters` column of the `units.tsv` file.
-You will need to find out the adapters used in the sequencing protocol that generated a unit: from your sequencing provider, or for published data from the study's metadata (or its authors).
-Then, enter the adapter sequences into the `adapters` column of that unit, preceded by the [correct `cutadapt` adapter argument](https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types).
-
-### strandedness of library preparation protocol
-
-To get the correct `geneCounts` from `STAR` output, you can provide information on the strandedness of the library preparation protocol used for a unit.
-`STAR` can produce counts for unstranded (`none` - this is the default), forward oriented (`yes`) and reverse oriented (`reverse`) protocols.  
-Enter the respective value into a `strandedness` column in the `units.tsv` file.
+Set workflow-specific `resources` or command line arguments (CLI) in the workflow profile `workflow/profiles/default.config.yaml`, which supersedes global Snakemake profiles.

@@ -20,7 +20,8 @@ ref:
 
 ##### PROCESSING #####
 
-# (nextera) adapter fasta (.fa) file and/or nucleotide adapter sequence of the used RNA-seq protocol (used by fastp for adapter triming, if provided)
+# (nextera) adapter fasta (.fa) file and/or nucleotide adapter sequence of the used RNA-seq protocol
+# used by fastp for adapter triming, if provided
 # if not available/applicable leave empty: ""
 adapter_fasta: path/to/adapters.fa
 
@@ -28,7 +29,7 @@ adapter_fasta: path/to/adapters.fa
 # see: https://github.com/OpenGene/fastp
 # useful parameters are --adapter_sequence GTCTCGTGGGCTCGG/auto TODO
 # or provide (nextera) adapter fasta (.fa) file and/or nucleotide adapter sequence of the used protocol --adapter_fasta path/to/adapters.fa
-fastp_args: "--adapter_sequence auto --detect_adapter_for_pe --trim_poly_g --cut_right --cut_window_size 4 --cut_mean_quality 20"
+fastp_args: "--adapter_sequence auto --trim_poly_g"
 
 # STAR aligner specific arguments
 # see: https://github.com/alexdobin/STAR
