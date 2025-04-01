@@ -1,0 +1,40 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  RNA-seq Data Processing, Quantification & Annotation
+  Pipeline
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - affiliation: CeMM Research Center for Molecular Medicine
+    given-names: Stephan
+    family-names: Reichl
+    orcid: 'https://orcid.org/0000-0001-8555-7198'
+  - given-names: Christoph
+    family-names: Bock
+    orcid: 'https://orcid.org/0000-0001-6091-3088'
+    affiliation: CeMM Research Center for Molecular Medicine
+repository-code: 'https://github.com/epigen/rnaseq_pipeline'
+url: 'https://epigen.github.io/rnaseq_pipeline/'
+abstract: >-
+  A Snakemake Workflow for RNA-seq Data Processing,
+  Quantification and Annotation and MrBiomics Module.
+keywords:
+  - Bioinformatics
+  - RNA-seq
+  - Transcriptomics
+  - Workflow
+  - Snakemake
+license: MIT
+references:
+  - authors:
+      - family-names: "Köster"
+        given-names: "Johannes"
+    title: "RNA-seq STAR DESeq2 workflow"
+    type: software
+    doi: "10.5281/zenodo.4737358"
+    notes: "If you use this workflow, please also cite this workflow as some structure and code were adapted from it."
