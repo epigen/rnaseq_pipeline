@@ -1,5 +1,5 @@
 [![MrBiomics](https://img.shields.io/badge/MrBiomics-red)](https://github.com/epigen/MrBiomics/)
-[![DOI](https://zenodo.org/badge/XXXXXX.svg)](https://zenodo.org/badge/latestdoi/XXXXXX)
+[![DOI](https://zenodo.org/badge/951923271.svg)](https://doi.org/10.5281/zenodo.15119355)
 [![](https://tokei.rs/b1/github/epigen/rnaseq_pipeline?category=code)]()
 [![](https://tokei.rs/b1/github/epigen/rnaseq_pipeline?category=files)]()
 [![GitHub license](https://img.shields.io/github/license/epigen/rnaseq_pipeline)](https://github.com/epigen/rnaseq_pipeline/blob/main/LICENSE)
@@ -15,7 +15,7 @@ A [Snakemake 8](https://snakemake.readthedocs.io/en/stable/) workflow for end-to
 > ⭐️ **Star and share modules you find valuable** 📤 - help others discover them, and guide our future work!
 
 > [!IMPORTANT]  
-> **If you use this workflow in a publication, please don't forget to give credit to the authors by citing it using this DOI [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) and acknowledging the [rna-seq-star-deseq2 workflow](https://github.com/snakemake-workflows/rna-seq-star-deseq2) DOI [10.5281/zenodo.4737358](https://doi.org/10.5281/zenodo.4737358) from which structure and code were adapted.**
+> **If you use this workflow in a publication, please don't forget to give credit to the authors by citing it using this DOI [10.5281/zenodo.15119355](https://doi.org/10.5281/zenodo.15119355) and acknowledging the [rna-seq-star-deseq2 workflow](https://github.com/snakemake-workflows/rna-seq-star-deseq2) DOI [10.5281/zenodo.4737358](https://doi.org/10.5281/zenodo.4737358) from which some structure and code were adapted.**
 
 ![Workflow Rulegraph](./workflow/dags/rulegraph.svg)
 
@@ -49,7 +49,7 @@ This is a template for the Methods section of a scientific publication and is in
 
 **Annotation.** Gene annotations from Ensembl were retrieved using the R package biomaRt (ver) [ref]. Annotations included Ensembl gene ID, gene symbol (`external_gene_name`), gene biotype, and description. Additionally, exon-based GC content (`exon_gc`) and cumulative exon length (`exon_length`) were calculated for each gene using a custom R function adapted from EDASeq (ver) [ref], leveraging biomaRt (ver) [ref] to fetch exon coordinates and sequences. This exon-based approach was chosen as sequencing reads in poly(A)-selected libraries primarily derive from exonic regions, making these metrics more appropriate for downstream bias correction (e.g., Conditional Quantile Normalization - CQN) than whole-gene metrics. A sample annotation file was generated, integrating input annotations with QC metrics.
 
-The processing and quantification described here was performed using a publicly available Snakemake [ver] (ref) workflow [[10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX)].
+The processing and quantification described here was performed using a publicly available Snakemake [ver] (ref) workflow [[10.5281/zenodo.15119355](https://doi.org/10.5281/zenodo.15119355)], which adopted code from anotehr workflow (ref) [10.5281/zenodo.4737358](https://doi.org/10.5281/zenodo.4737358).
 
 # 🚀 Features
 This workflow offers several key advantages for RNA-seq analysis over existing pipelines:
@@ -147,7 +147,7 @@ Below are some guidelines for the manual quality control of each sample using th
 # 🔗 Links
 - [GitHub Repository](https://github.com/epigen/rnaseq_pipeline/)
 - [GitHub Page](https://epigen.github.io/rnaseq_pipeline/)
-- [Zenodo Repository](https://doi.org/10.5281/zenodo.XXXXXX)
+- [Zenodo Repository](https://doi.org/10.5281/zenodo.15119355)
 - [Snakemake Workflow Catalog Entry](https://snakemake.github.io/snakemake-workflow-catalog/docs/workflows/epigen%20rnaseq_pipeline.html)
 
 # 📚 Resources

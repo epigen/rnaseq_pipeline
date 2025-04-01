@@ -18,6 +18,12 @@ authors:
     family-names: Bock
     orcid: 'https://orcid.org/0000-0001-6091-3088'
     affiliation: CeMM Research Center for Molecular Medicine
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.15119355
+    description: >-
+      Please use this DOI as it represents all versions, and will always
+      resolve to the latest one.
 repository-code: 'https://github.com/epigen/rnaseq_pipeline'
 url: 'https://epigen.github.io/rnaseq_pipeline/'
 abstract: >-
