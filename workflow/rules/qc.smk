@@ -122,6 +122,8 @@ rule rseqc_readdup:
         "logs/rseqc/rseqc_readdup/{sample}.log",
     params:
         prefix=lambda w, output: output[0].replace(".DupRate_plot.pdf", ""),
+    resources:
+        mem_mb=lambda wildcards, input: max(4 * input.size_mb, 4000)
     conda:
         "../envs/rseqc.yaml"
     shell:
