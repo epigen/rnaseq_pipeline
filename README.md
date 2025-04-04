@@ -66,13 +66,13 @@ This workflow offers several key advantages for RNA-seq analysis over existing p
 The workflow performs the following steps that produce the outlined results:
 
 - **Processing:**
-    - Automatically verifies (using samtools view) that the `read_typ` (single/paired-end) specified in the annotation matches the actual flags within the input BAM files, preventing downstream errors (`.check_read_type/{sample}.done`).
+    - Automatically verifies (using samtools view) that the `read_type` (single/paired-end) specified in the annotation matches the actual flags within the input BAM files, preventing downstream errors (`.check_read_type/{sample}.done`).
     - Combines multiple input raw/unaligned/unmapped [uBAM](https://gatk.broadinstitute.org/hc/en-us/articles/360035532132-uBAM-Unmapped-BAM-Format) files per sample into a single stream (using `samtools merge`).
     - Converts the merged BAM stream into FASTQ format, handling paired-end interleaving (using `samtools fastq`).
     - Processes the FASTQ stream for adapter trimming and quality filtering using `fastp`, generating QC reports (`fastp/{sample}/`).
-    > [!NOTE]  
-    > `fastp` adapter auto-detection is disabled because we use STDIN mode (i.e., stream the data through pipes) to be disk space efficient.
     - De-interleaves the filtered FASTQ stream into separate compressed R1 and R2 files for paired-end data, or compresses directly for single-end data using shell commands and `pigz`.
+> [!NOTE]  
+> `fastp` adapter auto-detection is disabled because we use STDIN mode (i.e., stream the data through pipes) to be disk space efficient.
 - **Quantification:**
     - Uses STAR `GeneCounts` to quantify reads per gene based on the specified Ensembl reference genome and annotation (`star/{sample}/`).
     - Handles unstranded, forward-stranded, and reverse-stranded library protocols based on the `strandedness` column.
@@ -80,11 +80,12 @@ The workflow performs the following steps that produce the outlined results:
 - **Annotation:**
     - Outputs gene annotations (`counts/gene_annotation.csv`).
       - Retrieves gene annotations (Ensembl ID, gene symbol, biotype, description) from Ensembl using `biomaRt`.
-      - Calculates **exon-based** GC content and cumulative exon length for each gene, suitable for poly(A) selected libraries (e.g., .
-      > [!NOTE]
-      > Gene annotation can take a while since it depends on the availability of external data sources accessed via `biomaRt`.
-      > GC-content and length are **exon-based**: In poly(A)‑selected libraries (such as Illumina TruSeq, Smart-seq or QuantSeq), the sequencing reads mainly come from exonic regions. Therefore, potential correction for GC bias and gene length should ideally use exon‑level GC content and effective exon length rather than whole‑gene metrics that include introns.
-    - Outputs a sample annotation table containing sample-wise general MultiQC statistics (`counts/sample_annotation.csv`).
+      - Calculates **exon-based** GC content and cumulative exon length for each gene, suitable for poly(A) selected libraries.
+      - Outputs a sample annotation table containing sample-wise general MultiQC statistics (`counts/sample_annotation.csv`).
+> [!NOTE]
+> Gene annotation can take a while since it depends on the availability of external data sources accessed via `biomaRt`.
+> 
+> GC-content and length are **exon-based**: In poly(A)‑selected libraries (such as Illumina TruSeq, Smart-seq or QuantSeq), the sequencing reads mainly come from exonic regions. Therefore, potential correction for GC bias and gene length should ideally use exon‑level GC content and effective exon length rather than whole‑gene metrics that include introns.
 - **QC & Reporting:**
     - Employs RSeQC tools to generate key quality metrics like strand specificity and read distribution across genomic features (`rseqc/`).
     - Aggregates QC metrics from fastp, STAR and RSeQC into a single report using MultiQC (`report/multiqc_report.html`) with [AI summaries](https://seqera.io/blog/ai-summaries-multiqc/).
