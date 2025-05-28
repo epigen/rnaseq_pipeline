@@ -106,6 +106,8 @@ rule rseqc_readdis:
     priority: 1
     log:
         "logs/rseqc/rseqc_readdis/{sample}.log",
+    resources:
+        mem_mb=lambda wildcards, input: max(4 * input.size_mb, 4000)
     conda:
         "../envs/rseqc.yaml"
     shell:

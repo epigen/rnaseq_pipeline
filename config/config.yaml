@@ -27,13 +27,14 @@ adapter_fasta: path/to/adapters.fa
 
 # fastp specific arguments for adapter trimming and quality control filtering
 # see: https://github.com/OpenGene/fastp
-# useful parameters are --adapter_sequence GTCTCGTGGGCTCGG/auto TODO
+# useful parameters are --adapter_sequence GTCTCGTGGGCTCGG/auto
 # or provide (nextera) adapter fasta (.fa) file and/or nucleotide adapter sequence of the used protocol --adapter_fasta path/to/adapters.fa
 fastp_args: "--adapter_sequence auto --trim_poly_g"
 
 # STAR aligner specific arguments
 # see: https://github.com/alexdobin/STAR
-star_args: ""
+# here we provide the ENCODE standard options for long RNA-seq pipeline (3.3.2 ENCODE options)
+star_args: "--alignIntronMax 1000000 --alignIntronMin 20 --alignMatesGapMax 1000000 --alignSJDBoverhangMin 1 --alignSJoverhangMin 8 --outFilterMismatchNmax 999 --outFilterMismatchNoverReadLmax 0.04 --outFilterMultimapNmax 20 --outFilterType BySJout"
 
 
 

@@ -47,7 +47,7 @@ rule trim_filter:
     input:
         bams = lambda wc: annot.loc[wc.sample, "bam_file"],
         read_type_check = os.path.join(result_path,".check_read_type","{sample}.done"),
-        adapter_fasta = config["adapter_fasta"] if config["adapter_fasta"]!="" else []
+        adapter_fasta = config["adapter_fasta"] if config["adapter_fasta"]!="" else [],
     output:
         fastq_filtered_R1 = temp(os.path.join(result_path,"fastp","{sample}","{sample}_R1.filtered.fastq.gz")),
         fastq_filtered_R2 = temp(os.path.join(result_path,"fastp","{sample}","{sample}_R2.filtered.fastq.gz")),
@@ -100,7 +100,7 @@ rule align:
         reads_per_gene = os.path.join(result_path,"star","{sample}","ReadsPerGene.out.tab"),
     resources:
         # dynamic memory allocation based on attempts (multiple attempts can be configured with --retries X)
-        mem_mb=lambda wildcards, attempt: attempt*int(config.get("mem", "16000")),
+        mem_mb=lambda wildcards, attempt: attempt*int(config.get("mem", "32000")),
     threads: 24
     log:
         "logs/star/{sample}.log",

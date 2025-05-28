@@ -1,79 +1,16 @@
-library(biomaRt)
 library(tidyverse)
-library(EDASeq)
+library(GenomicRanges)
+library(rtracklayer)
+library(Rsamtools)
 # useful error messages upon aborting
 library("cli")
-
-# adapted from EDASeq::getGeneLengthAndGCContent to work with specific ensembl
-# otherwise data does not match or genes are not found
-# returns exon gc content and exon lengths of transcripts for e.g., conditional quantile normalization
-getGeneLengthAndGCContent <- function(id, id.type, ensembl){
-    inp.id <- id
-    message( paste0( "Downloading sequence",
-        ifelse(length(id) > 1, "s", ""), " ..."))
-    if(length(id) > 100) message("This may take a few minutes ...")
-
-    # download sequence
-    # (1) get exon coordinates
-    attrs <- c(id.type, "ensembl_exon_id",
-        "chromosome_name", "exon_chrom_start", "exon_chrom_end")
-    coords <- getBM(filters=id.type, attributes=attrs, values=id, mart=ensembl)
-    id <- unique(coords[,id.type])
-    coords <- GRangesList(sapply(id,
-        function(i)
-        {
-            i.coords <- coords[coords[,1]== i, 3:5]
-            g <- GRanges(i.coords[,1], IRanges(i.coords[,2],i.coords[,3]))
-            return(g)
-        }), compress=FALSE)
-    coords <- reduce(coords)
-    len <- sum(width(coords))
-
-    # (2) get genes and sequences
-    sel <- c(id.type, "start_position", "end_position")
-    gene.pos <- getBM(attributes = sel, filters=id.type, values=id,
-                      mart=ensembl)
-    gene.seqs <- getSequence(id=id,
-        type=id.type, seqType="gene_exon_intron", mart=ensembl)
-
-    # (3) get exonic sequences and correspondig GC content
-    gc.cont <- sapply(id,
-        function(i)
-        {
-            # exon coordinates, gene position & sequence for current id i
-            ecoords <- coords[[i]]
-            gpos <- gene.pos[gene.pos[,id.type] == i,
-                    c("start_position", "end_position")]
-            gseq <- DNAString(
-                gene.seqs[gene.seqs[,id.type] == i, "gene_exon_intron"])
-
-            # exon coordinates relative to gene position
-            start <- start(ranges(ecoords)) - gpos[1,1] + 1
-            end <- end(ranges(ecoords)) - gpos[1,1] + 1
-            eseq <- gseq[IRanges(start, end)]
-            gc.cont <- sum(alphabetFrequency(eseq, as.prob=TRUE)[c("C","G")])
-            return(gc.cont)
-        }
-    )
-
-    res <- cbind(len, gc.cont)
-    colnames(res) <- c("exon_length", "exon_gc")
-    rownames(res) <- id
-
-    # (4) order according to input ids
-    not.found <- !(inp.id %in% rownames(res))
-    na.col <- rep(NA, sum(not.found))
-    rn <- c(rownames(res), inp.id[not.found])
-    res <- rbind(res, cbind(na.col, na.col))
-    rownames(res) <- rn
-    res <- res[inp.id,]
-    return(res)
-}
 
 #### config
 
 # input
 counts_path <- file.path(snakemake@input[["counts"]])
+gtf_path <- file.path(snakemake@input[["gtf"]])
+fasta_path <- file.path(snakemake@input[["fasta"]])
 
 # output
 gene_annot_path <- file.path(snakemake@output[["gene_annotation"]])
@@ -148,13 +85,32 @@ gene_annot <- biomaRt::getBM(
             mart = mart,
             )
 
-# get gc-content and gene length (this takes some time)
-gc_length <- getGeneLengthAndGCContent(
-    id = gene_annot$ensembl_gene_id,
-    id.type = 'ensembl_gene_id',
-    ensembl = mart
-)
+#### get gc-content and gene length
+# Code adapted from here: https://www.biostars.org/p/91218/#9612509
+#Load the annotation and reduce it
+GTF <- import.gff(gtf_path, format="gtf", feature.type="exon") # if we would want to inlcude introns use feature.type = c("exon","intron")
+grl <- reduce(split(GTF, elementMetadata(GTF)$gene_id))
+reducedGTF <- unlist(grl, use.names=T)
+elementMetadata(reducedGTF)$gene_id <- rep(names(grl), elementNROWS(grl))
 
-# merge and save gene annotations
+#Open the fasta file
+FASTA <- FaFile(fasta_path)
+open(FASTA)
+
+#Add the GC numbers
+elementMetadata(reducedGTF)$nGCs <- letterFrequency(getSeq(FASTA, reducedGTF), "GC")[,1]
+elementMetadata(reducedGTF)$widths <- width(reducedGTF)
+
+#Create a list of the ensembl_id/GC/length
+calc_GC_length <- function(x) {
+    nGCs = sum(elementMetadata(x)$nGCs)
+    width = sum(elementMetadata(x)$widths)
+    c(width, nGCs/width)
+}
+gc_length <- t(sapply(split(reducedGTF, elementMetadata(reducedGTF)$gene_id), calc_GC_length))
+colnames(gc_length) <- c("exon_length", "exon_gc")
+gc_length <- as.data.frame(gc_length)
+
+#### merge and save gene annotations
 gene_annot <- cbind(gene_annot, gc_length[gene_annot$ensembl_gene_id, ])
 write.table(gene_annot, file=gene_annot_path, sep=",", quote=TRUE, row.names=FALSE)
