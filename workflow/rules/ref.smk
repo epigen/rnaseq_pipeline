@@ -47,7 +47,7 @@ rule bwa_index:
     input:
         os.path.join(resource_path,"genome.fasta"),
     output:
-        multiext(os.path.join(resource_path,"genome.fasta", ".amb", ".ann", ".bwt", ".pac", ".sa")),
+        multiext(os.path.join(resource_path,"genome.fasta"), ".amb", ".ann", ".bwt", ".pac", ".sa"),
     log:
         "logs/rules/bwa_index.log",
     resources:
