@@ -208,3 +208,30 @@ rule multiqc:
         "logs/rules/multiqc.log",
     wrapper:
         "v5.9.0/bio/multiqc"
+
+
+# visualize sample annotation (including QC metrics)
+rule plot_sample_annotation:
+    input:
+        sample_annotation = config["annotation"],
+        sample_annotation_w_QC = os.path.join(result_path, "counts", "sample_annotation.csv"),
+    output:
+        sample_annotation_plot = os.path.join(result_path,"report","sample_annotation.png"),
+        sample_annotation_html = report(os.path.join(result_path,"report","sample_annotation.html"),
+                       caption="../report/sample_annotation.rst",
+                       category="{}_{}".format(config["project_name"], module_name),
+                       subcategory="QC",
+                       labels={
+                           "name": "Sample annotation",
+                           "type": "HTML",
+                           }),
+    log:
+        "logs/rules/plot_sample_annotation.log",
+    resources:
+        mem_mb="1000",
+    conda:
+        "../envs/ggplot.yaml"
+    script:
+        "../scripts/plot_sample_annotation.R"
+
+

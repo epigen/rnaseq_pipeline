@@ -44,6 +44,7 @@ rule all:
         # QUANTIFICATION
         counts = os.path.join(result_path, "counts", "counts.csv"),
         sample_annotation = os.path.join(result_path, "counts", "sample_annotation.csv"),
+        sample_annotation_plot = os.path.join(result_path, "report", "sample_annotation.png"),
         # ANNOTATION
         gene_annotation = os.path.join(result_path,'counts',"gene_annotation.csv"),
         # EXPORT environments and configurations

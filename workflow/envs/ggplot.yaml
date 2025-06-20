@@ -1,0 +1,12 @@
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - r-tidyverse
+  - r-data.table
+  - r-patchwork
+  - r-ggplot2
+  - r-ggnewscale
+  - r-plotly
+  - r-htmlwidgets

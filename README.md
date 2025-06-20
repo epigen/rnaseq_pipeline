@@ -95,6 +95,7 @@ The workflow performs the following steps that produce the outlined results:
 - **QC & Reporting:**
     - Employs `RSeQC` tools to generate key quality metrics like strand specificity and read distribution across genomic features (`rseqc/`).
     - Aggregates QC metrics from `fastp`, `STAR` and `RSeQC` into a single report using `MultiQC` (`report/multiqc_report.html`) with [AI summaries](https://seqera.io/blog/ai-summaries-multiqc/).
+    - Generates a hierarchically-clustered QC heatmap with matching metadata annotation, exported both as a PNG and an interactive HTML with metadata as tooltips.
 
 ---
 
@@ -104,6 +105,8 @@ The workflow produces the following directory structure:
 └── rnaseq_pipeline/
     ├── report/
     │   └── multiqc_report.html         # Aggregated QC report for all samples
+    │   └── sample_annotation.png       # Hierarchically clustered heatamp of QC metrics, annotated with metadata
+    │   └── sample_annotation.html      # Interactive hierarchically clustered heatamp of QC metrics, with metadata as tooltip
     ├── fastp/                          # fastp QC/filtering and adapter trimming outputs per sample
     ├── rseqc/                          # RSeQC output per sample
     ├── star/                           # STAR output per sample
@@ -136,7 +139,7 @@ Explore detailed examples showcasing module usage in comprehensive end-to-end an
 - [RNA-seq Analysis Recipe](https://github.com/epigen/MrBiomics/wiki/RNAseq-Analysis-Recipe)
   
 # 🔍 Quality Control
-Below are some guidelines for the manual quality control of each sample using the generated `MultiQC` report, but keep in mind that every experiment/dataset is different. Thresholds are general suggestions and may vary based on experiment type, organism, and library prep.
+Below are some guidelines for the manual quality control of each sample using the generated `MultiQC` report and visualized (interactive) sample annotation, but keep in mind that every experiment/dataset is different. Thresholds are general suggestions and may vary based on experiment type, organism, and library prep.
 
 - **Read Depth (STAR)**: Count of `(Uniquely) Mapped Reads` >10M is minimum, >20M reads is optimal for differential expression analysis.
 - **Alignment Rate (STAR):** `% (Uniquely) Mapped Reads` >70-80%. Low rates might indicate contamination or reference issues.
