@@ -135,9 +135,8 @@ This workflow is written with Snakemake and its usage is described in the [Snake
 Detailed specifications can be found here [./config/README.md](./config/README.md)
 
 # 📖 Examples
-Explore detailed examples showcasing module usage in comprehensive end-to-end analyses (including data, configuration, annotation and results) in our [MrBiomics Recipes](https://github.com/epigen/MrBiomics?tab=readme-ov-file#-recipes):
-- [RNA-seq Analysis Recipe](https://github.com/epigen/MrBiomics/wiki/RNAseq-Analysis-Recipe)
-  
+Explore a detailed example showcasing module usage and downstream analysis in our comprehensive end-to-end [MrBiomics Recipe](https://github.com/epigen/MrBiomics?tab=readme-ov-file#-recipes) for [RNA-seq Analysis](https://github.com/epigen/MrBiomics/wiki/RNA%E2%80%90seq-Analysis-Recipe), including data, configuration, annotation and results.
+
 # 🔍 Quality Control
 Below are some guidelines for the manual quality control of each sample using the generated `MultiQC` report and visualized (interactive) sample annotation, but keep in mind that every experiment/dataset is different. Thresholds are general suggestions and may vary based on experiment type, organism, and library prep.
 
