@@ -228,7 +228,7 @@ rule plot_sample_annotation:
     log:
         "logs/rules/plot_sample_annotation.log",
     resources:
-        mem_mb="1000",
+        mem_mb="4000",
     conda:
         "../envs/ggplot.yaml"
     script:

@@ -4,6 +4,7 @@ library(tidyverse)
 library(patchwork)
 library(ggplot2)
 library(ggnewscale)
+library(stringr)
 # for interactive plotting
 library(plotly)
 library(htmlwidgets)
@@ -21,10 +22,11 @@ sample_annotation_html_path <- snakemake@output[["sample_annotation_html"]]
 
 #### load & prepare data ####
 # load data
-sample_annotation <- data.frame(fread(file.path(sample_annotation_path), header=TRUE), row.names=1)
+sample_annotation <- data.frame(fread(file.path(sample_annotation_path), header=TRUE), row.names=1, check.names = FALSE)
 anno <- data.frame(fread(file.path(sample_annotation_w_QC_path), header=TRUE), row.names=1)
 
 # determine QC (pipeline provided) columns
+names(sample_annotation) <- gsub(" +", "_", names(sample_annotation)) # replace empty space ` ` with underscore `_`
 qc_cols <- setdiff(names(anno), names(sample_annotation))
 
 # determine metadata (user provided) columns by removing non-numeric columns that are unique for each row (e.g., bam_file)
@@ -146,11 +148,28 @@ if(length(meta_cols) > 0){
                                              barwidth  = 0.15)) 
         } else {                                         # categorical legend
             pal <- setNames(dat$col, dat$value)
+
+            # reduce legend in case of more than 10 levels
+            max_items   <- min(10, length(unique(dat$value)))
+            all_levels  <- unique(names(pal))
+            show_levels <- all_levels[1:max_items]
+            
             p_meta <- p_meta +
                 geom_tile(data = dat, aes(x = meta, y = sample, fill = value), colour = "grey60", linewidth = 0.1) +
-                scale_fill_manual(values = pal, name = v,
-                  guide = guide_legend(keywidth  = 0.25,                  # thinner
-                                       keyheight = 0.4))
+                scale_fill_manual(values = pal, 
+                                  # name = v,
+                                  breaks = show_levels,
+                                  guide = guide_legend(keywidth  = 0.25,
+                                                       keyheight = 0.4,
+                                                       ncol=1,
+                                                       byrow = TRUE,
+                                                       title = ifelse(
+                                                           length(all_levels) <= max_items,
+                                                           v,
+                                                           paste0(v, " (showing ", max_items, "/", length(all_levels), ")")
+                                                           )
+                                                      )
+                                 )
         }
     }
 }
