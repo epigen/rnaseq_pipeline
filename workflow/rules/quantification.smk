@@ -51,7 +51,7 @@ rule sample_annotation:
     run:
         multiqc_df = pd.read_csv(os.path.join(input.multiqc_stats,"multiqc_general_stats.txt"), delimiter='\t', index_col=0).loc[list(samples.keys()),:]
         # merge by sample names (index) and drop redundant or unnecessary columns
-        annot_df = pd.merge(annot, multiqc_df, left_index=True, right_index=True, how='inner').drop(['bam_file', 'sample_name'], axis=1)
+        annot_df = pd.merge(annot_samples, multiqc_df, left_index=True, right_index=True, how='inner').drop(['bam_file', 'sample_name'], axis=1)
         # make column names R compatible
         annot_df.columns = (
                 annot_df.columns

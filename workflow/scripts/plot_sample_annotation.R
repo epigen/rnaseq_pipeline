@@ -22,7 +22,9 @@ sample_annotation_html_path <- snakemake@output[["sample_annotation_html"]]
 
 #### load & prepare data ####
 # load data
-sample_annotation <- data.frame(fread(file.path(sample_annotation_path), header=TRUE), row.names=1, check.names = FALSE)
+sample_annotation <- data.table::fread(file.path(sample_annotation_path), header = TRUE)
+sample_annotation <- data.frame(sample_annotation[!duplicated(sample_annotation[[1]]), ], row.names = 1, check.names = FALSE)
+
 anno <- data.frame(fread(file.path(sample_annotation_w_QC_path), header=TRUE), row.names=1)
 
 # determine QC (pipeline provided) columns
