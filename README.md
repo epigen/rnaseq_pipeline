@@ -140,12 +140,17 @@ Explore a detailed example showcasing module usage and downstream analysis in ou
 # 🔍 Quality Control
 Below are some guidelines for the manual quality control of each sample using the generated `MultiQC` report and visualized (interactive) sample annotation, but keep in mind that every experiment/dataset is different. Thresholds are general suggestions and may vary based on experiment type, organism, and library prep.
 
+**General Statistics** (table)
 - **Read Depth (STAR)**: Count of `(Uniquely) Mapped Reads` >10M is minimum, >20M reads is optimal for differential expression analysis.
 - **Alignment Rate (STAR):** `% (Uniquely) Mapped Reads` >70-80%. Low rates might indicate contamination or reference issues.
-- **Alignment Scores & Gene Counts (STAR):** High proportion of uniquely mapped reads assigned to exonic regions (e.g., >60-70% for poly(A) mRNA-seq). Low rates could suggest gDNA contamination or high intronic reads. In case of many intronic reads or non-poly(A) mRNA-seq protocols do not use exon-based gene annotations (gc-content and length) downstream.
-- **Read Quality (fastp):** `% > Q30` (=Percentage of bases with Phred score > 30, after filtering/trimming) > 90%. High average quality scores across reads after trimming. Ensure effective adapter removal.
-- **Library Complexity (fastp/RSeQC):** % Duplication Rate should not be excessively high (highly variable, interpret in context of expression). Very high rates might indicate low input or PCR issues.
-- **Strand Specificity (RSeQC):** For stranded protocols, >90-95% reads should match the expected strand.
+- **Read Quality (fastp):** `% > Q30` (=Percentage of reads > Q30 after filtering) > 90%. High average quality scores across reads after trimming. Ensure effective adapter removal.
+- **Library Complexity (fastp):** `% Duplication` (=Duplication rate before filtering) should not be excessively high (highly variable, interpret in context of expression). Very high rates might indicate low input or PCR issues.
+
+**Specific Statistics** (panels)
+- **Read Distribution (RSeQC):** High proportion of uniquely mapped reads assigned to exonic regions (e.g., >60-70% for poly(A) mRNA-seq). Low rates could suggest gDNA contamination or high intronic reads.
+- **Infer experiment (RSeQC):** For stranded protocols, >90-95% reads should match the expected strandedness. For unstranded protocols expect a ~50:50 split.
+
+**Additional QC**
 - Inspect [**Genome Browser Tracks**](https://github.com/epigen/genome_tracks/) using UCSC Genome Browser (online) or IGV (local)
     - Compare all samples to the best, based on above's QC metrics.
     - Check cell type / experiment-specific markers or sex chromosome (`X`/`Y`) for expression as **positive controls**.
