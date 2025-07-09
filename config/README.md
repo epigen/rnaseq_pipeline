@@ -8,6 +8,6 @@ You need one configuration file (`config.yaml`) and one annotation file (`annota
   - read_type: "single" or "paired"
   - bam_file: path to the raw/unaligned/unmapped [uBAM](https://gatk.broadinstitute.org/hc/en-us/articles/360035532132-uBAM-Unmapped-BAM-Format) files. No whitespaces in file paths of names allowed.
   - strandedness: To get the correct `geneCounts` from `STAR` output, you can provide information on the strandedness of the library preparation protocol used for a unit. `STAR` can produce counts for unstranded (`none` - this is the default, e.g., Smart-seq2), forward oriented (`yes` e.g., QuantSeq) and reverse oriented (`reverse`) protocols. 
-  - (optional) additional sample metadata columns can be added and will be included on a sample-basis in the output sample annotation file.
+  - (optional, **but highly recommended**) metadata: additional sample metadata/annotation columns can/should be added and will be included on a sample-basis in the output sample annotation file (i.e., sequencing units from the same sample should have the same metadata and only differ in their `bam_file` column).
 
 Set workflow-specific `resources` or command line arguments (CLI) in the workflow profile `workflow/profiles/default.config.yaml`, which supersedes global Snakemake profiles.
