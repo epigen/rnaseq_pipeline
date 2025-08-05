@@ -165,6 +165,24 @@ Below are some guidelines for the manual quality control of each sample using th
 - [Snakemake Workflow Catalog Entry](https://snakemake.github.io/snakemake-workflow-catalog/docs/workflows/epigen%20rnaseq_pipeline.html)
 
 # 📚 Resources
+- To convert FASTQ files to the required uBAM file format, we recommend using [Picard's FastqToSam](https://gatk.broadinstitute.org/hc/en-us/articles/360036351132-FastqToSam-Picard): 
+    ```
+    # ── Install Picard (adds a `picard` runner to $PATH) ──────────────────
+    conda install picard --channel bioconda
+
+    # ── single-end FASTQ → uBAM ────────────────────────────────────────────
+    picard FastqToSam \
+        FASTQ=/path/to/<sample>.fastq.gz \
+        OUTPUT=/path/to/<sample>.ubam \
+        SAMPLE_NAME=<sample_id>
+    
+    # ── paired-end FASTQs → uBAM ───────────────────────────────────────────
+    picard FastqToSam \
+        FASTQ=/path/to/<sample>_R1.fastq.gz \
+        FASTQ2=/path/to/<sample>_R2.fastq.gz \
+        OUTPUT=/path/to/<sample>.ubam \
+        SAMPLE_NAME=<sample_id>
+    ```
 - Recommended compatible [MrBiomics Modules](https://github.com/epigen/MrBiomics/#-modules)
   - for upstream sample acquisition:
     - [Fetch Public Sequencing Data and Metadata Using iSeq](https://github.com/epigen/fetch_ngs/) to retrieve and prepare public data for downstream processing.
